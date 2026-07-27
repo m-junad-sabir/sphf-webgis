@@ -1,13 +1,24 @@
-require([
-    "esri/Map",
-    "esri/views/MapView",
-    "esri/Graphic",
-    "esri/geometry/Point",
-    "esri/widgets/ScaleBar",
-    "esri/widgets/Zoom",
-    "esri/widgets/BasemapGallery",
-    "esri/widgets/Expand"
-], function(Map, MapView, Graphic, Point, ScaleBar, Zoom, BasemapGallery, Expand) {
+// --- ArcGIS imports ----------------------------------------------------------
+const [
+    config, Map, MapView, FeatureLayer, GroupLayer, LayerList,
+    Home, Legend, PopupTemplate, Expand, BasemapGallery,
+    ScaleBar, Compass, SimpleMarkerSymbol
+] = await $arcgis.import([
+    "@arcgis/core/config.js",
+    "@arcgis/core/Map.js",
+    "@arcgis/core/views/MapView.js",
+    "@arcgis/core/layers/FeatureLayer.js",
+    "@arcgis/core/layers/GroupLayer.js",
+    "@arcgis/core/widgets/LayerList.js",
+    "@arcgis/core/widgets/Home.js",
+    "@arcgis/core/widgets/Legend.js",
+    "@arcgis/core/PopupTemplate.js",
+    "@arcgis/core/widgets/Expand.js",
+    "@arcgis/core/widgets/BasemapGallery.js",
+    "@arcgis/core/widgets/ScaleBar.js",
+    "@arcgis/core/widgets/Compass.js",
+    "@arcgis/core/symbols/SimpleMarkerSymbol.js"
+]);
 
     // 1. Initialize the ArcGIS Map with a valid basemap style
     const map = new Map({
@@ -224,5 +235,3 @@ require([
         view.goTo({ center: [68.5247, 25.8943], zoom: 7 });
         view.popup.close();
     });
-
-});
