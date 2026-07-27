@@ -1,0 +1,248 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body, html {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Top Main Header Styling */
+.main-header {
+    height: 70px;
+    background: #ffffff;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    border-bottom: 2px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1200;
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+    z-index: 2;
+}
+
+.logo-sphf, .logo-sindh {
+    height: 50px;
+    max-width: 90px;
+    object-fit: contain;
+    background: #ffffff;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.header-titles {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 70%;
+}
+
+.header-titles h1 {
+    font-size: 1.75rem;
+    color: #0f172a;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.header-titles p {
+    font-size: 0.75rem;
+    color: #475569;
+    font-weight: 500;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    height: calc(100vh - 70px);
+    width: 100vw;
+    position: relative;
+}
+
+/* Sidebar Styling (Light Theme & Collapsed by default) */
+.sidebar {
+    width: 320px;
+    background: #f8fafc;
+    color: #1e293b;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+    border-right: 1px solid #e2e8f0;
+    z-index: 1000;
+    overflow-y: auto;
+    transition: width 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
+}
+
+.sidebar.collapsed {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+    border: none;
+    opacity: 0;
+}
+
+/* Sidebar Top Row with Title and Close Cross Button */
+.sidebar-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+}
+
+.sidebar-top-row h3 {
+    border-bottom: none !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.sidebar-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #64748b;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-close-btn:hover {
+    background: #f1f5f9;
+    color: #ef4444; /* Red color on hover for close button */
+}
+
+/* Hide Map Toggle Button when Sidebar is Open */
+.map-toggle-control.hidden {
+    display: none !important;
+}
+
+.filter-section {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.filter-section h3 {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+    color: #0f172a;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    color: #475569;
+    font-weight: 600;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: #0284c7;
+}
+
+.btn-reset {
+    width: 100%;
+    padding: 8px;
+    background: #0284c7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-reset:hover {
+    background: #0369a1;
+}
+
+/* Map Viewport */
+#map {
+    flex-grow: 1;
+    height: 100%;
+}
+
+/* Floating Map Toggle Button (Top-Left on Map) */
+.map-toggle-control {
+    background: #ffffff;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    cursor: pointer;
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.map-toggle-control:hover {
+    background: #f1f5f9;
+}
+
+/* Reposition Leaflet Zoom Controls to Top-Right Corner */
+.leaflet-top.leaflet-right {
+    top: 10px; /* Positions zoom controls nicely just below header */
+}
+
+/* NESPAK Watermark on Map Right Corner */
+.map-nespak-watermark {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 6px 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.map-nespak-watermark span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.logo-nespak-map {
+    height: 22px;
+    max-width: 70px;
+    object-fit: contain;
+}

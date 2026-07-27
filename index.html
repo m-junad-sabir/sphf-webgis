@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPHF WebGIS Dashboard - Sindh Housing & Recovery</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Top Main Header Bar -->
+    <header class="main-header">
+        <!-- Left: SPHF Logo -->
+        <div class="header-left">
+            <img src="images/sphflogo.png" alt="SPHF Logo" class="logo-sphf" onerror="this.style.display='none'">
+        </div>
+
+        <!-- Center: Title -->
+        <div class="header-titles">
+            <h1>Geospatial Mapping in Various Districts of Sindh Province</h1>
+        </div>
+
+        <!-- Right: Govt of Sindh Logo -->
+        <div class="header-right">
+            <img src="images/sindhlogo.png" alt="Govt of Sindh Logo" class="logo-sindh" onerror="this.style.display='none'">
+        </div>
+    </header>
+
+    <!-- Main Dashboard Body Layout -->
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation & Hierarchy Panel (Collapsed by Default) -->
+        <aside id="sidebar" class="sidebar collapsed">
+            <div class="filter-section">
+                <div class="sidebar-top-row">
+                    <h3>Administrative Hierarchy</h3>
+                    <button id="sidebarCloseBtn" class="sidebar-close-btn" title="Close Sidebar">&times;</button>
+                </div>
+                
+                <!-- District Selector -->
+                <div class="form-group">
+                    <label for="districtSelect">Select District:</label>
+                    <select id="districtSelect">
+                        <option value="">-- Choose District --</option>
+                        <option value="sukkur">Sukkur</option>
+                        <option value="larkana">Larkana</option>
+                        <option value="mirpurkhas">Mirpurkhas</option>
+                    </select>
+                </div>
+
+                <!-- Tehsil Selector -->
+                <div class="form-group">
+                    <label for="tehsilSelect">Select Tehsil:</label>
+                    <select id="tehsilSelect" disabled>
+                        <option value="">-- Choose Tehsil --</option>
+                    </select>
+                </div>
+
+                <button id="resetBtn" class="btn-reset">Reset View</button>
+            </div>
+        </aside>
+
+        <!-- Map Viewport -->
+        <main id="map"></main>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Custom JS -->
+    <script src="main.js"></script>
+</body>
+</html>
