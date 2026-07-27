@@ -1,185 +1,228 @@
-// 1. Initialize the Map centered over Sindh, Pakistan with zoom control placed at topright
-const map = L.map('map', {
-    zoomControl: false // Disable default position
-}).setView([25.8943, 68.5247], 7);
+require([
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/Graphic",
+    "esri/geometry/Point",
+    "esri/widgets/ScaleBar",
+    "esri/widgets/Zoom",
+    "esri/widgets/BasemapGallery",
+    "esri/widgets/Expand"
+], function(Map, MapView, Graphic, Point, ScaleBar, Zoom, BasemapGallery, Expand) {
 
-// Add Zoom Control to Top-Right Corner
-L.control.zoom({
-    position: 'topright'
-}).addTo(map);
-
-// Add OpenStreetMap Tile Layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-// Add Scale Bar Tool
-L.control.scale({
-    imperial: false,
-    position: 'bottomleft'
-}).addTo(map);
-
-// 2. Add Floating Toggle Button Control on Map Top-Left (Hides when opened)
-const sidebarToggleControl = L.control({ position: 'topleft' });
-
-sidebarToggleControl.onAdd = function(map) {
-    const div = L.DomUtil.create('div', 'map-toggle-control');
-    div.id = 'mapToggleBtnContainer';
-    div.innerHTML = `<span>☰ Info Desk</span>`;
-    
-    // Prevent map click propagation when clicking the button
-    L.DomEvent.disableClickPropagation(div);
-
-    div.addEventListener('click', function() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.remove('collapsed');
-        
-        // Hide the toggle button while sidebar is open
-        div.classList.add('hidden');
-        
-        // Smoothly resize map container after transition finishes
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 300);
+    // 1. Initialize the ArcGIS Map with a valid basemap style
+    const map = new Map({
+        basemap: "topo-vector"
     });
 
-    return div;
-};
-
-sidebarToggleControl.addTo(map);
-
-// 3. Close / Cross Button Functionality inside Sidebar (Reveals toggle button when closed)
-const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
-if (sidebarCloseBtn) {
-    sidebarCloseBtn.addEventListener('click', function() {
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtnContainer = document.getElementById('mapToggleBtnContainer');
-        
-        // Collapse sidebar
-        sidebar.classList.add('collapsed');
-        
-        // Show toggle button again when sidebar closes
-        if (toggleBtnContainer) {
-            toggleBtnContainer.classList.remove('hidden');
+    // 2. Initialize the MapView centered over Sindh, Pakistan
+    const view = new MapView({
+        container: "map",
+        map: map,
+        center: [68.5247, 25.8943], // [Longitude, Latitude]
+        zoom: 7,
+        ui: {
+            components: ["attribution"] // Remove default zoom so we can position it manually
         }
-        
-        // Smoothly resize map container after transition finishes
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 300);
     });
-}
 
-// Add NESPAK Logo to the Bottom Right Corner of the Map View
-const nespakWatermark = L.control({ position: 'bottomright' });
+    // Add Custom Zoom Control to Top-Right Corner (just below the header)
+    const zoomWidget = new Zoom({
+        view: view
+    });
+    view.ui.add(zoomWidget, "top-right");
 
-nespakWatermark.onAdd = function(map) {
-    const div = L.DomUtil.create('div', 'map-nespak-watermark');
-    div.innerHTML = `
+    // Add Scale Bar Tool at Bottom-Left Corner
+    const scaleBar = new ScaleBar({
+        view: view,
+        unit: "metric",
+        position: "bottom-left"
+    });
+    view.ui.add(scaleBar, "bottom-left");
+
+    // Add Basemap Gallery Widget wrapped inside an Expand widget at Bottom-Right Corner
+    const basemapGallery = new BasemapGallery({
+        view: view
+    });
+
+    const bgExpand = new Expand({
+        view: view,
+        content: basemapGallery,
+        expandIcon: "basemap",
+        expandTooltip: "Basemap Gallery"
+    });
+    view.ui.add(bgExpand, "bottom-right");
+
+    // 3. Add Custom Floating "Info Desk" Toggle Button Control on Map Top-Left
+    const toggleBtnNode = document.createElement("div");
+    toggleBtnNode.id = "mapToggleBtnContainer";
+    toggleBtnNode.className = "map-toggle-control";
+    toggleBtnNode.innerHTML = `<span>☰ Info Desk</span>`;
+
+    toggleBtnNode.addEventListener("click", function() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.remove("collapsed");
+        toggleBtnNode.classList.add("hidden");
+    });
+
+    view.ui.add(toggleBtnNode, "top-left");
+
+    // 4. Close / Cross Button Functionality inside Sidebar
+    const sidebarCloseBtn = document.getElementById("sidebarCloseBtn");
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener("click", function() {
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.add("collapsed");
+            toggleBtnNode.classList.remove("hidden");
+        });
+    }
+
+    // 5. Add NESPAK Logo Watermark to Bottom Right Corner (aligned with bottom controls)
+    const watermarkNode = document.createElement("div");
+    watermarkNode.className = "map-nespak-watermark";
+    watermarkNode.innerHTML = `
         <span>Designed by</span>
         <img src="images/nespaklogo.png" alt="NESPAK Logo" class="logo-nespak-map" onerror="this.style.display='none'">
     `;
-    return div;
-};
+    view.ui.add(watermarkNode, "bottom-right");
 
-nespakWatermark.addTo(map);
+    // 6. Mock Hierarchical Spatial Data
+    const spatialHierarchy = {
+        sukkur: {
+            name: "Sukkur District",
+            coords: [68.8574, 27.7052],
+            zoom: 10,
+            tehsils: {
+                sukkur_city: { name: "Sukkur City", coords: [68.8485, 27.7134], zoom: 12 },
+                rohri: { name: "Rohri Tehsil", coords: [68.8923, 27.6923], zoom: 12 },
+                salehpat: { name: "Salehpat Tehsil", coords: [69.3500, 27.5333], zoom: 11 }
+            }
+        },
+        larkana: {
+            name: "Larkana District",
+            coords: [68.2043, 27.5562],
+            zoom: 10,
+            tehsils: {
+                larkana_tehsil: { name: "Larkana Tehsil", coords: [68.2043, 27.5562], zoom: 12 },
+                ratodero: { name: "Ratodero Tehsil", coords: [68.2889, 27.8033], zoom: 12 },
+                dokri: { name: "Dokri Tehsil", coords: [68.0997, 27.3592], zoom: 12 }
+            }
+        },
+        mirpurkhas: {
+            name: "Mirpurkhas District",
+            coords: [69.0130, 25.5276],
+            zoom: 10,
+            tehsils: {
+                mirpurkhas_tehsil: { name: "Mirpurkhas Tehsil", coords: [69.0130, 25.5276], zoom: 12 },
+                digri: { name: "Digri Tehsil", coords: [68.9138, 25.1539], zoom: 12 },
+                kot_gulam_muhammad: { name: "Kot Ghulam Muhammad", coords: [69.1333, 25.3167], zoom: 12 }
+            }
+        }
+    };
 
-// 4. Mock Hierarchical Spatial Data (Coordinates & Zoom targets)
-const spatialHierarchy = {
-    sukkur: {
-        name: "Sukkur District",
-        coords: [27.7052, 68.8574],
-        zoom: 10,
-        tehsils: {
-            sukkur_city: { name: "Sukkur City", coords: [27.7134, 68.8485], zoom: 12 },
-            rohri: { name: "Rohri Tehsil", coords: [27.6923, 68.8923], zoom: 12 },
-            salehpat: { name: "Salehpat Tehsil", coords: [27.5333, 69.3500], zoom: 11 }
-        }
-    },
-    larkana: {
-        name: "Larkana District",
-        coords: [27.5562, 68.2043],
-        zoom: 10,
-        tehsils: {
-            larkana_tehsil: { name: "Larkana Tehsil", coords: [27.5562, 68.2043], zoom: 12 },
-            ratodero: { name: "Ratodero Tehsil", coords: [27.8033, 68.2889], zoom: 12 },
-            dokri: { name: "Dokri Tehsil", coords: [27.3592, 68.0997], zoom: 12 }
-        }
-    },
-    mirpurkhas: {
-        name: "Mirpurkhas District",
-        coords: [25.5276, 69.0130],
-        zoom: 10,
-        tehsils: {
-            mirpurkhas_tehsil: { name: "Mirpurkhas Tehsil", coords: [25.5276, 69.0130], zoom: 12 },
-            digri: { name: "Digri Tehsil", coords: [25.1539, 68.9138], zoom: 12 },
-            kot_gulam_muhammad: { name: "Kot Ghulam Muhammad", coords: [25.3167, 69.1333], zoom: 12 }
-        }
+    let currentGraphics = [];
+
+    function clearGraphics() {
+        view.graphics.removeMany(currentGraphics);
+        currentGraphics = [];
     }
-};
 
-let currentMarkers = [];
+    const districtSelect = document.getElementById('districtSelect');
+    const tehsilSelect = document.getElementById('tehsilSelect');
+    const resetBtn = document.getElementById('resetBtn');
 
-function clearMarkers() {
-    currentMarkers.forEach(marker => map.removeLayer(marker));
-    currentMarkers = [];
-}
+    districtSelect.addEventListener('change', function() {
+        const selectedDistrictKey = this.value;
+        clearGraphics();
+        
+        tehsilSelect.innerHTML = '<option value="">-- Choose Tehsil --</option>';
+        
+        if (!selectedDistrictKey) {
+            tehsilSelect.disabled = true;
+            view.goTo({ center: [68.5247, 25.8943], zoom: 7 });
+            return;
+        }
 
-const districtSelect = document.getElementById('districtSelect');
-const tehsilSelect = document.getElementById('tehsilSelect');
-const resetBtn = document.getElementById('resetBtn');
+        const districtData = spatialHierarchy[selectedDistrictKey];
+        view.goTo({ center: districtData.coords, zoom: districtData.zoom });
+        
+        const point = new Point({
+            longitude: districtData.coords[0],
+            latitude: districtData.coords[1]
+        });
 
-districtSelect.addEventListener('change', function() {
-    const selectedDistrictKey = this.value;
-    clearMarkers();
-    
-    tehsilSelect.innerHTML = '<option value="">-- Choose Tehsil --</option>';
-    
-    if (!selectedDistrictKey) {
+        const markerGraphic = new Graphic({
+            geometry: point,
+            symbol: {
+                type: "simple-marker",
+                color: [226, 119, 40],
+                outline: { color: [255, 255, 255], width: 2 }
+            },
+            popupTemplate: {
+                title: districtData.name,
+                content: "SPHF Housing Zone"
+            }
+        });
+
+        view.graphics.add(markerGraphic);
+        currentGraphics.push(markerGraphic);
+        
+        view.popup.open({
+            features: [markerGraphic],
+            location: point
+        });
+
+        tehsilSelect.disabled = false;
+        for (const [tehsilKey, tehsilObj] of Object.entries(districtData.tehsils)) {
+            const option = document.createElement('option');
+            option.value = tehsilKey;
+            option.textContent = tehsilObj.name;
+            tehsilSelect.appendChild(option);
+        }
+    });
+
+    tehsilSelect.addEventListener('change', function() {
+        const selectedDistrictKey = districtSelect.value;
+        const selectedTehsilKey = this.value;
+
+        if (!selectedTehsilKey) return;
+
+        const tehsilData = spatialHierarchy[selectedDistrictKey].tehsils[selectedTehsilKey];
+        view.goTo({ center: tehsilData.coords, zoom: tehsilData.zoom });
+
+        const point = new Point({
+            longitude: tehsilData.coords[0],
+            latitude: tehsilData.coords[1]
+        });
+
+        const tehsilMarker = new Graphic({
+            geometry: point,
+            symbol: {
+                type: "simple-marker",
+                color: [0, 122, 194],
+                outline: { color: [255, 255, 255], width: 2 }
+            },
+            popupTemplate: {
+                title: tehsilData.name,
+                content: "Tehsil Level Intervention"
+            }
+        });
+
+        view.graphics.add(tehsilMarker);
+        currentGraphics.push(tehsilMarker);
+
+        view.popup.open({
+            features: [tehsilMarker],
+            location: point
+        });
+    });
+
+    resetBtn.addEventListener('click', function() {
+        districtSelect.value = "";
+        tehsilSelect.innerHTML = '<option value="">-- Choose Tehsil --</option>';
         tehsilSelect.disabled = true;
-        map.setView([25.8943, 68.5247], 7);
-        return;
-    }
+        clearGraphics();
+        view.goTo({ center: [68.5247, 25.8943], zoom: 7 });
+        view.popup.close();
+    });
 
-    const districtData = spatialHierarchy[selectedDistrictKey];
-    map.setView(districtData.coords, districtData.zoom);
-    
-    const districtMarker = L.marker(districtData.coords)
-        .addTo(map)
-        .bindPopup(`<b>${districtData.name}</b><br>SPHF Housing Zone`)
-        .openPopup();
-    currentMarkers.push(districtMarker);
-
-    tehsilSelect.disabled = false;
-    for (const [tehsilKey, tehsilObj] of Object.entries(districtData.tehsils)) {
-        const option = document.createElement('option');
-        option.value = tehsilKey;
-        option.textContent = tehsilObj.name;
-        tehsilSelect.appendChild(option);
-    }
-});
-
-tehsilSelect.addEventListener('change', function() {
-    const selectedDistrictKey = districtSelect.value;
-    const selectedTehsilKey = this.value;
-
-    if (!selectedTehsilKey) return;
-
-    const tehsilData = spatialHierarchy[selectedDistrictKey].tehsils[selectedTehsilKey];
-    map.setView(tehsilData.coords, tehsilData.zoom);
-
-    const tehsilMarker = L.marker(tehsilData.coords)
-        .addTo(map)
-        .bindPopup(`<b>${tehsilData.name}</b><br>Tehsil Level Intervention`)
-        .openPopup();
-    currentMarkers.push(tehsilMarker);
-});
-
-resetBtn.addEventListener('click', function() {
-    districtSelect.value = "";
-    tehsilSelect.innerHTML = '<option value="">-- Choose Tehsil --</option>';
-    tehsilSelect.disabled = true;
-    clearMarkers();
-    map.setView([25.8943, 68.5247], 7);
 });
