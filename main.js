@@ -28,7 +28,7 @@ const [
 
     // 1. Initialize the ArcGIS Map with a valid basemap style
     const map = new Map({
-        basemap: "topo-vector"
+        basemap: "satellite"
     });
 
     // Add visualization layers for LayerList
@@ -45,7 +45,7 @@ const [
         definitionExpression: "COUNTRY = 'Pakistan'"
     });
 
-    map.addMany([districtsLayer, boundaryLayer]);
+    map.addMany([boundaryLayer,districtsLayer]);
 
     // Add main Deh FeatureLayer for administrative hierarchy
     const dehFeatureLayer = new GeoJSONLayer({
@@ -66,8 +66,8 @@ const [
     const view = new MapView({
         container: "map",
         map: map,
-        center: [68.5247, 25.8943], // [Longitude, Latitude]
-        zoom: 7,
+        center: [68.456299194, 26.440361376], // [Longitude, Latitude]
+        zoom: 9,
         ui: {
             components: ["attribution"] // Remove default zoom so we can position it manually
         }
@@ -80,24 +80,20 @@ const [
     view.ui.add(zoomWidget, "top-right");
 
     // Add Scale Bar Tool at Bottom-Left Corner
-    const scaleBar = new ScaleBar({
-        view: view,
-        unit: "metric",
-        position: "bottom-left"
-    });
-    view.ui.add(scaleBar, "bottom-left");
+    const scaleBarExpand = new Expand({ view, content: new ScaleBar({ view, style: "line", unit: "metric" }), expandIcon: "measure-line" });
+    view.ui.add(scaleBarExpand, "bottom-left");
 
     // Add Home Button
     const homeBtn = new Home({
         view: view
     });
-    view.ui.add(homeBtn, "top-left");
+    view.ui.add(new Home({ view }), "top-trailing");
 
     // Add Compass Widget
     const compass = new Compass({
         view: view
     });
-    view.ui.add(compass, "top-left");
+    view.ui.add(new Compass({view}), "top-right");
 
     // Add Basemap Gallery Widget wrapped inside an Expand widget at Bottom-Right Corner
     const basemapGallery = new BasemapGallery({
@@ -122,55 +118,22 @@ const [
                 open: false
             };
 
-            // Add opacity slider
-            const opacitySlider = document.createElement("input");
-            opacitySlider.type = "range";
-            opacitySlider.min = 0;
-            opacitySlider.max = 1;
-            opacitySlider.step = 0.1;
-            opacitySlider.value = item.layer.opacity || 1;
-            opacitySlider.style.width = "100%";
-            opacitySlider.style.marginTop = "8px";
-
-            opacitySlider.addEventListener("input", function() {
-                item.layer.opacity = parseFloat(opacitySlider.value);
-            });
-
-            item.actionsSections = [
-                [
-                    {
-                        title: "Toggle Legend",
-                        className: "esri-icon-layer-list",
-                        action: function() {
-                            item.panel.open = !item.panel.open;
-                        }
-                    }
-                ]
-            ];
-
-            // Add opacity slider to the item
-            setTimeout(() => {
-                const container = document.querySelector(`[aria-label="${item.title}"]`);
-                if (container && container.parentElement) {
-                    container.parentElement.appendChild(opacitySlider);
-                }
-            }, 100);
         }
     });
 
-    const layerListExpand = new Expand({
-        view: view,
-        content: layerList,
-        expandIcon: "layers",
-        expandTooltip: "Layer List"
-    });
-    view.ui.add(layerListExpand, "top-right");
+    // const layerListExpand = new Expand({
+    //     view: view,
+    //     content: layerList,
+    //     expandIcon: "layers",
+    //     expandTooltip: "Layer List"
+    // });
+    view.ui.add(layerList, "top-right");
 
     // 3. Add Custom Floating "Info Desk" Toggle Button Control on Map Top-Left
     const toggleBtnNode = document.createElement("div");
     toggleBtnNode.id = "mapToggleBtnContainer";
     toggleBtnNode.className = "map-toggle-control";
-    toggleBtnNode.innerHTML = `<span>☰ Info Desk</span>`;
+    toggleBtnNode.innerHTML = `<span>QUERY DATA</span>`;
 
     toggleBtnNode.addEventListener("click", function() {
         const sidebar = document.getElementById("sidebar");
