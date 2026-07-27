@@ -350,8 +350,7 @@ const [
 
     function enableAutoPopupsForGeoJSON(layers) {
         const systemFields = [
-            "objectid", "fid", "globalid", 
-            "shape", "shape_length", "shape_area", 
+            "objectid", "globalid", 
             "geometry", "type"
         ];
 
@@ -386,8 +385,18 @@ const [
         });
     }
 
-    // Enable auto-popups for all layers
-    enableAutoPopupsForGeoJSON([districtsLayer, boundaryLayer, dehFeatureLayer]);
+    // Enable auto-popups for all layers including child layers
+    const allChildLayers = [
+        M1_Abdul_Gaffoor_Jatoi, M1_Abdul_Karim_Jatoi, M1_Bangul_Jatoi, M1_Dadilo_Khan_Jatoi, M1_Qadir_Pur,
+        M2_Habib_Kot, M2_Qazi_Wahan,
+        M3_Jaffer_Dasti, M3_Muhammad_Aalam_Shar,
+        M4_Nandhi_Kal_Wari, M4_Teenda,
+        M5_Haji_Ali_Muhammad_Brohi, M5_Juma_Khan_Brohi, M5_Loung_Labano,
+        M6_MilitaryForm_QalandarBux,
+        M7_Mad_Khoso
+    ];
+    
+    enableAutoPopupsForGeoJSON([districtsLayer, boundaryLayer, dehFeatureLayer, ...allChildLayers]);
 
     // 6. Administrative Hierarchy with FeatureLayer Queries
     const districtSelect = document.getElementById('districtSelect');
@@ -501,6 +510,9 @@ const [
         // Filter layer to selected district
         dehFeatureLayer.definitionExpression = `District = '${selectedDistrict}'`;
 
+        // Wait for layer to load and query extent
+        await dehFeatureLayer.load();
+        
         // Query extent and zoom
         const query = new Query();
         query.where = `District = '${selectedDistrict}'`;
@@ -510,7 +522,22 @@ const [
         try {
             const result = await dehFeatureLayer.queryExtent(query);
             if (result.extent) {
-                view.goTo({ extent: result.extent });
+                view.goTo({ extent: result.extent, zoom: 10 });
+            } else {
+                // Fallback: query features and calculate extent manually
+                const featureResult = await dehFeatureLayer.queryFeatures(query);
+                if (featureResult.features.length > 0) {
+                    const extent = featureResult.features.reduce((acc, feature) => {
+                        if (feature.geometry && feature.geometry.extent) {
+                            if (!acc) return feature.geometry.extent.clone();
+                            acc.union(feature.geometry.extent);
+                        }
+                        return acc;
+                    }, null);
+                    if (extent) {
+                        view.goTo({ extent: extent, zoom: 10 });
+                    }
+                }
             }
         } catch (error) {
             console.error("Error querying district extent:", error);
@@ -538,6 +565,9 @@ const [
         // Filter layer to selected tehsil
         dehFeatureLayer.definitionExpression = `District = '${selectedDistrict}' AND Taluka = '${selectedTehsil}'`;
 
+        // Wait for layer to load and query extent
+        await dehFeatureLayer.load();
+
         // Query extent and zoom
         const query = new Query();
         query.where = `District = '${selectedDistrict}' AND Taluka = '${selectedTehsil}'`;
@@ -547,7 +577,22 @@ const [
         try {
             const result = await dehFeatureLayer.queryExtent(query);
             if (result.extent) {
-                view.goTo({ extent: result.extent });
+                view.goTo({ extent: result.extent, zoom: 12 });
+            } else {
+                // Fallback: query features and calculate extent manually
+                const featureResult = await dehFeatureLayer.queryFeatures(query);
+                if (featureResult.features.length > 0) {
+                    const extent = featureResult.features.reduce((acc, feature) => {
+                        if (feature.geometry && feature.geometry.extent) {
+                            if (!acc) return feature.geometry.extent.clone();
+                            acc.union(feature.geometry.extent);
+                        }
+                        return acc;
+                    }, null);
+                    if (extent) {
+                        view.goTo({ extent: extent, zoom: 12 });
+                    }
+                }
             }
         } catch (error) {
             console.error("Error querying tehsil extent:", error);
@@ -572,6 +617,9 @@ const [
         // Filter layer to specific deh
         dehFeatureLayer.definitionExpression = `District = '${selectedDistrict}' AND Taluka = '${selectedTehsil}' AND Deh = '${selectedDeh}'`;
 
+        // Wait for layer to load and query extent
+        await dehFeatureLayer.load();
+
         // Query extent and zoom
         const query = new Query();
         query.where = `District = '${selectedDistrict}' AND Taluka = '${selectedTehsil}' AND Deh = '${selectedDeh}'`;
@@ -581,7 +629,22 @@ const [
         try {
             const result = await dehFeatureLayer.queryExtent(query);
             if (result.extent) {
-                view.goTo({ extent: result.extent });
+                view.goTo({ extent: result.extent, zoom: 14 });
+            } else {
+                // Fallback: query features and calculate extent manually
+                const featureResult = await dehFeatureLayer.queryFeatures(query);
+                if (featureResult.features.length > 0) {
+                    const extent = featureResult.features.reduce((acc, feature) => {
+                        if (feature.geometry && feature.geometry.extent) {
+                            if (!acc) return feature.geometry.extent.clone();
+                            acc.union(feature.geometry.extent);
+                        }
+                        return acc;
+                    }, null);
+                    if (extent) {
+                        view.goTo({ extent: extent, zoom: 14 });
+                    }
+                }
             }
         } catch (error) {
             console.error("Error querying deh extent:", error);
