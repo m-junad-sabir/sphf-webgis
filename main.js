@@ -126,14 +126,24 @@ const layerList = new LayerList({
         event.item.panel = { content: "legend", open: false };
     }
 });
-view.ui.add(layerList, "top-right");
+
+const layerListExpand = new Expand({
+    view,
+    content: layerList,
+    expandIcon: "layers",
+    collapseIcon: "layers",
+    expandTooltip: "Show Layer List",
+    collapseTooltip: "Hide Layer List",
+    expanded: false   // collapsed by default
+});
+view.ui.add(layerListExpand, "top-right");
 
 // NESPAK watermark
 const watermarkNode = document.createElement("div");
 watermarkNode.className = "map-nespak-watermark";
 watermarkNode.innerHTML = `
-    <span>Designed by</span>
     <img src="images/nespaklogo.png" alt="NESPAK" class="logo-nespak-map" onerror="this.style.display='none'">
+    <span>Designed by NESPAK</span>
 `;
 view.ui.add(watermarkNode, "bottom-right");
 
@@ -260,18 +270,41 @@ async function loadDehs(district, taluka) {
     } catch (e) { console.error("loadDehs:", e); }
 }
 
-async function goToExtent(whereClause, zoomLevel) {
-    await dehFeatureLayer.load();
-    const q = new Query();
-    q.where = whereClause;
-    q.returnGeometry = true;
-    q.outSpatialReference = view.spatialReference;
+async function goToExtent(whereClause) {
     try {
-        const res = await dehFeatureLayer.queryExtent(q);
-        if (res.extent) {
-            view.goTo({ extent: res.extent, zoom: zoomLevel });
+        await dehFeatureLayer.load();
+
+        const q = new Query();
+        q.where = whereClause;
+        q.returnGeometry = true;
+        q.outFields = ["*"];
+        // Do NOT set outSpatialReference — let the layer return its native SR
+        // so goTo() can reproject correctly
+
+        const res = await dehFeatureLayer.queryFeatures(q);
+
+        if (!res.features || res.features.length === 0) {
+            console.warn("goToExtent: no features matched:", whereClause);
+            return;
         }
-    } catch (e) { console.error("goToExtent:", e); }
+
+        // goTo() with an array of graphics/features uses their geometries and
+        // automatically handles projection + calculates a bounding extent
+        await view.goTo(res.features, {
+            animate: true,
+            duration: 600,
+            easing: "ease-in-out"
+        });
+
+        // After flying to the features, expand the view slightly so edges
+        // aren't clipped by the side panels
+        if (view.extent) {
+            view.goTo(view.extent.expand(1.3), { animate: false });
+        }
+
+    } catch (e) {
+        console.error("goToExtent error:", e);
+    }
 }
 
 // =============================================================================
@@ -397,8 +430,7 @@ function renderVillageList(names) {
         const li = document.createElement('li');
         li.textContent = name;
         li.addEventListener('click', () => {
-            // Zoom to that deh when clicked
-            goToExtent(`Deh = '${name}'`, 14);
+            goToExtent(`Deh = '${name}'`);
         });
         villageList.appendChild(li);
     });
@@ -433,7 +465,7 @@ districtSelect.addEventListener('change', async function () {
     }
 
     dehFeatureLayer.definitionExpression = `District = '${d}'`;
-    await goToExtent(`District = '${d}'`, 10);
+    await goToExtent(`District = '${d}'`);
     await loadTehsils(d);
     tehsilSelect.disabled = false;
     await populateInfoPanel(`District = '${d}'`);
@@ -454,7 +486,7 @@ tehsilSelect.addEventListener('change', async function () {
     }
 
     dehFeatureLayer.definitionExpression = `District = '${d}' AND Taluka = '${t}'`;
-    await goToExtent(`District = '${d}' AND Taluka = '${t}'`, 12);
+    await goToExtent(`District = '${d}' AND Taluka = '${t}'`);
     await loadDehs(d, t);
     dehSelect.disabled = false;
     await populateInfoPanel(`District = '${d}' AND Taluka = '${t}'`);
@@ -474,7 +506,7 @@ dehSelect.addEventListener('change', async function () {
     }
 
     dehFeatureLayer.definitionExpression = `District = '${d}' AND Taluka = '${t}' AND Deh = '${dh}'`;
-    await goToExtent(`District = '${d}' AND Taluka = '${t}' AND Deh = '${dh}'`, 14);
+    await goToExtent(`District = '${d}' AND Taluka = '${t}' AND Deh = '${dh}'`);
     await populateInfoPanel(`District = '${d}' AND Taluka = '${t}' AND Deh = '${dh}'`);
 });
 
@@ -490,8 +522,7 @@ applyQueryBtn.addEventListener('click', async function () {
 
     dehFeatureLayer.definitionExpression = where === "1=1" ? null : where;
     if (where !== "1=1") {
-        const zoom = dh ? 14 : t ? 12 : 10;
-        await goToExtent(where, zoom);
+        await goToExtent(where);
         await populateInfoPanel(where);
     }
 });
