@@ -10,77 +10,199 @@
     <link rel="stylesheet" href="https://js.arcgis.com/calcite-components/3.2.1/calcite.css" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
-
     <!-- ArcGIS calcite components script link -->
     <script type="module" src="https://js.arcgis.com/calcite-components/3.2.1/calcite.esm.js"></script>
     <!-- Load Map components from CDN -->
     <script type="module" src="https://js.arcgis.com/4.34/map-components/"></script>
-
 </head>
 <body>
 
-    <!-- Top Main Header Bar -->
+    <!-- ═══════════════════════════════════════════════════════════
+         PREMIUM HEADER
+    ═══════════════════════════════════════════════════════════ -->
     <header class="main-header">
-        <!-- Left: SPHF Logo -->
-        <div class="header-left">
-            <img src="images/sphflogo.png" alt="SPHF Logo" class="logo-sphf" onerror="this.style.display='none'">
+        <!-- Left logos -->
+        <div class="header-logos header-logos--left">
+            <div class="logo-wrapper">
+                <img src="images/sphflogo.png" alt="SPHF Logo" class="header-logo" onerror="this.style.display='none'">
+            </div>
         </div>
 
-        <!-- Center: Title -->
-        <div class="header-titles">
-            <h1>Geospatial Mapping in Various Districts of Sindh Province</h1>
+        <!-- Center title block -->
+        <div class="header-center">
+            <div class="header-badge">GEOSPATIAL INFORMATION SYSTEM</div>
+            <h1 class="header-title">Sindh Province Housing &amp; Flood Recovery</h1>
+            <p class="header-subtitle">Geospatial Mapping — Districts of Sindh Province, Pakistan</p>
         </div>
 
-        <!-- Right: Govt of Sindh Logo -->
-        <div class="header-right">
-            <img src="images/sindhlogo.png" alt="Govt of Sindh Logo" class="logo-sindh" onerror="this.style.display='none'">
+        <!-- Right logos -->
+        <div class="header-logos header-logos--right">
+            <div class="logo-wrapper">
+                <img src="images/sindhlogo.png" alt="Govt of Sindh Logo" class="header-logo" onerror="this.style.display='none'">
+            </div>
+            <div class="logo-wrapper logo-wrapper--nespak">
+                <span class="powered-label">Powered by</span>
+                <img src="images/nespaklogo.png" alt="NESPAK Logo" class="header-logo header-logo--nespak" onerror="this.style.display='none'">
+            </div>
         </div>
     </header>
 
-    <!-- Main Dashboard Body Layout -->
+    <!-- Header accent bar -->
+    <div class="header-accent-bar">
+        <span class="accent-chip"><span class="accent-dot accent-dot--green"></span>Live Data</span>
+        <span class="accent-chip"><span class="accent-dot accent-dot--blue"></span>ArcGIS Platform</span>
+        <span class="accent-chip"><span class="accent-dot accent-dot--amber"></span>Sindh Province</span>
+        <span class="accent-chip"><span class="accent-dot accent-dot--purple"></span>SPHF Programme</span>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MAIN DASHBOARD BODY
+    ═══════════════════════════════════════════════════════════ -->
     <div class="dashboard-container">
-        <!-- Sidebar Navigation & Hierarchy Panel (Collapsed by Default) -->
-        <aside id="sidebar" class="sidebar collapsed">
-            <div class="filter-section">
-                <div class="sidebar-top-row">
-                    <h3>Administrative Hierarchy</h3>
-                    <button id="sidebarCloseBtn" class="sidebar-close-btn" title="Close Sidebar">&times;</button>
-                </div>
-                
-                <!-- District Selector -->
+
+        <!-- ── LEFT PANEL: Query / Filter ───────────────────────── -->
+        <aside class="panel panel--query" id="queryPanel">
+            <div class="panel-header">
+                <span class="panel-icon">⚙</span>
+                <span class="panel-title">Administrative Query</span>
+            </div>
+            <div class="panel-body">
+                <!-- District -->
                 <div class="form-group">
-                    <label for="districtSelect">Select District:</label>
-                    <select id="districtSelect">
-                        <option value="">-- Choose District --</option>
-                        <option value="sukkur">Sukkur</option>
-                        <option value="larkana">Larkana</option>
-                        <option value="mirpurkhas">Mirpurkhas</option>
-                    </select>
+                    <label for="districtSelect">District</label>
+                    <div class="select-wrapper">
+                        <select id="districtSelect">
+                            <option value="">— Choose District —</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Taluka -->
+                <div class="form-group">
+                    <label for="tehsilSelect">Taluka</label>
+                    <div class="select-wrapper">
+                        <select id="tehsilSelect" disabled>
+                            <option value="">— Choose Taluka —</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Deh -->
+                <div class="form-group">
+                    <label for="dehSelect">Deh</label>
+                    <div class="select-wrapper">
+                        <select id="dehSelect" disabled>
+                            <option value="">— Choose Deh —</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Village -->
+                <div class="form-group">
+                    <label for="villageSelect">Village</label>
+                    <div class="select-wrapper">
+                        <select id="villageSelect" disabled>
+                            <option value="">— Choose Village —</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Tehsil Selector -->
-                <div class="form-group">
-                    <label for="tehsilSelect">Select Taluka:</label>
-                    <select id="tehsilSelect" disabled>
-                        <option value="">-- Choose Taluka --</option>
-                    </select>
-                </div>
+                <button id="applyQueryBtn" class="btn btn--primary">
+                    <span>🔍</span> Apply Filter
+                </button>
+                <button id="resetBtn" class="btn btn--outline">
+                    <span>↺</span> Reset
+                </button>
 
-                <!-- Deh Selector -->
-                <div class="form-group">
-                    <label for="dehSelect">Select Deh:</label>
-                    <select id="dehSelect" disabled>
-                        <option value="">-- Choose Deh --</option>
-                    </select>
+                <!-- Summary Stats cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDistricts">—</div>
+                        <div class="stat-label">Districts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTalukas">—</div>
+                        <div class="stat-label">Talukas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDehs">—</div>
+                        <div class="stat-label">Dehs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statVillages">—</div>
+                        <div class="stat-label">Villages</div>
+                    </div>
                 </div>
-
-                <button id="resetBtn" class="btn-reset">Reset View</button>
             </div>
         </aside>
 
-        <!-- Map Viewport -->
-        <main id="map"></main>
-    </div>
+        <!-- ── CENTER: Map ───────────────────────────────────────── -->
+        <main class="panel panel--map" id="map"></main>
+
+        <!-- ── RIGHT PANEL: Info, Charts, Table ─────────────────── -->
+        <aside class="panel panel--info" id="infoPanel">
+
+            <!-- Summary Counts strip -->
+            <div class="info-section info-section--counts">
+                <div class="info-count-card">
+                    <div class="info-count-val" id="infoCountHH">—</div>
+                    <div class="info-count-lbl">Households</div>
+                </div>
+                <div class="info-count-card">
+                    <div class="info-count-val" id="infoCountPop">—</div>
+                    <div class="info-count-lbl">Population</div>
+                </div>
+                <div class="info-count-card">
+                    <div class="info-count-val" id="infoCountFeatures">—</div>
+                    <div class="info-count-lbl">Features</div>
+                </div>
+            </div>
+
+            <!-- Chart Panel -->
+            <div class="info-section info-section--chart">
+                <div class="section-header">
+                    <span class="section-icon">📊</span>
+                    <span class="section-title">Data Overview</span>
+                </div>
+                <div class="chart-placeholder" id="chartArea">
+                    <div class="placeholder-inner">
+                        <span class="placeholder-icon">📈</span>
+                        <p>Select an area to view charts</p>
+                    </div>
+                    <!-- Chart bars rendered via JS -->
+                    <div id="chartBars" class="chart-bars" style="display:none;"></div>
+                </div>
+            </div>
+
+            <!-- Tabular View Panel -->
+            <div class="info-section info-section--table">
+                <div class="section-header">
+                    <span class="section-icon">📋</span>
+                    <span class="section-title">Attribute Table</span>
+                    <span class="table-count-badge" id="tableCountBadge">0 records</span>
+                </div>
+                <div class="table-wrapper" id="tableWrapper">
+                    <div class="placeholder-inner">
+                        <span class="placeholder-icon">🗂️</span>
+                        <p>Select an area to view records</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Village Name Search -->
+            <div class="info-section info-section--search">
+                <div class="section-header">
+                    <span class="section-icon">🏘</span>
+                    <span class="section-title">Village Names</span>
+                </div>
+                <div class="village-search-box">
+                    <input type="text" id="villageSearchInput" placeholder="Search village..." class="village-search-input">
+                </div>
+                <ul id="villageList" class="village-list">
+                    <li class="village-list-empty">Query an area to see villages</li>
+                </ul>
+            </div>
+
+        </aside>
+
+    </div><!-- /.dashboard-container -->
 
     <!-- ArcGIS Maps SDK for JavaScript JS -->
     <script src="https://js.arcgis.com/4.34/"></script>

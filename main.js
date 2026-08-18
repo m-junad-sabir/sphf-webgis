@@ -1,6 +1,6 @@
 // --- ArcGIS imports ----------------------------------------------------------
 const [
-    config, Map, MapView, FeatureLayer,GeoJSONLayer, GroupLayer, LayerList,
+    config, Map, MapView, FeatureLayer, GeoJSONLayer, GroupLayer, LayerList,
     Home, Legend, PopupTemplate, Expand, BasemapGallery,
     ScaleBar, Compass, SimpleMarkerSymbol, Point, Graphic,
     Zoom, Query
@@ -26,639 +26,499 @@ const [
     "@arcgis/core/rest/support/Query.js"
 ]);
 
-    // 1. Initialize the ArcGIS Map with a valid basemap style
-    const map = new Map({
-        basemap: "satellite"
-    });
+// =============================================================================
+// MAP SETUP
+// =============================================================================
+const map = new Map({ basemap: "satellite" });
 
-    // Add visualization layers for LayerList
-    const districtsLayer = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/8fc5f3b81eb5469cb1628903a57a9ea7/data",
-        title: "Districts of Pakistan",
-        visible: false
-    });
+const districtsLayer = new GeoJSONLayer({
+    url: "https://www.arcgis.com/sharing/rest/content/items/8fc5f3b81eb5469cb1628903a57a9ea7/data",
+    title: "Districts of Pakistan",
+    visible: false
+});
 
-    const boundaryLayer = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/1d46e9fd0f204a3e807b6fe590b8b9c3/data",
-        title: "Pakistan Boundary",
-        visible: false,
-        definitionExpression: "COUNTRY = 'Pakistan'"
-    });
+const boundaryLayer = new GeoJSONLayer({
+    url: "https://www.arcgis.com/sharing/rest/content/items/1d46e9fd0f204a3e807b6fe590b8b9c3/data",
+    title: "Pakistan Boundary",
+    visible: false,
+    definitionExpression: "COUNTRY = 'Pakistan'"
+});
 
-    // Add main Deh FeatureLayer for administrative hierarchy
-    const dehFeatureLayer = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/8ea72b39982844f7873ad2d529c57bf0/data",
-        title: "Deh Administrative Layer",
-        popupTemplate: {
-            title: "{Deh}",
-            content: `
-                <b>District:</b> {District}<br>
-                <b>Tehsil/Taluka:</b> {Taluka}<br>
-                <b>Deh:</b> {Deh}
-            `
-        }
-    });
-
-    // Adding Deh Child Layers 
-    const M1_Abdul_Gaffoor_Jatoi = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/5f2031c1340145b6b54b33449c5056ca/data",
-        title: "M1 Abdul Gaffoor Jatoi",
-        visible: true
-    });
-    const M1_Abdul_Karim_Jatoi = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/70b69adf88a247da875cbcc8663579e0/data",
-        title: "M1 Abdul Kariim Jatoi",
-        visible: true
-    });
-    const M1_Bangul_Jatoi = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/cdc73404a70949f29e9eb2f0a7e471e3/data",
-        title: "M1 Bangul Jatoi",
-        visible: true
-    });
-    const M1_Dadilo_Khan_Jatoi = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/99ff164c26af41e7ae859548c2a1fa80/data",
-        title: "M1 Dadilo Khan Jatoi",
-        visible: true
-    });
-    const M1_Qadir_Pur = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/70a5fee21d16449eac3102383eec6889/data",
-        title: "M1 Qadir Pur",
-        visible: true
-    });
-    const M2_Habib_Kot = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/65c1b90f9c7547ce8d27ff16fb8b2787/data",
-        title: "M2 Habib Kot",
-        visible: true
-    });
-    const M2_Qazi_Wahan = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/2ea0ac8d3a184eafa6a606b11dab21dc/data",
-        title: "M2 Qazi Wahan",
-        visible: true
-    });
-    const M3_Jaffer_Dasti = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/98ee98fd86714378bf197732d3db1ec7/data",
-        title: "M3 Jaffer Dasti",
-        visible: true
-    });
-    const M3_Muhammad_Aalam_Shar = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/8c3448c3ab7e460294c428136d60c347/data",
-        title: "M3 Muhammad Aalam Shar",
-        visible: true
-    });
-    const M4_Nandhi_Kal_Wari = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/d96a0fd3108f4e58b5454992efa4817f/data",
-        title: "M4 Nandhi Kal Wari",
-        visible: true
-    });
-    const M4_Teenda = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/764be13b9e5144e597bfce54cef6ac6e/data",
-        title: "M4 Teenda",
-        visible: true
-    });
-    const M5_Haji_Ali_Muhammad_Brohi = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/4e33dda4f48e4b17826c52c21c26560a/data",
-        title: "M5 Haji Ali Muhammad Brohi",
-        visible: true
-    });
-    const M5_Juma_Khan_Brohi = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/f0828f6021264ab280828d91a74e49fa/data",
-        title: "M5 Juma Khan Brohi",
-        visible: true
-    });
-    const M5_Loung_Labano = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/df7b8fa81a3c42e0a039adf013e29939/data",
-        title: "M5 Loung Labano",
-        visible: true
-    });
-    const M6_MilitaryForm_QalandarBux = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/9aa1b945e91e476994f9aff2d9d7de02/data",
-        title: "M6 Military Form QalandarBux",
-        visible: true
-    });
-    const M7_Mad_Khoso = new GeoJSONLayer({
-        url: "https://www.arcgis.com/sharing/rest/content/items/ca8d8744e4fb4075a1862ca517838ade/data",
-        title: "M7 Mad Khoso",
-        visible: true
-    });
-    //////////////////////////////////////////////////////////////////////////////////////////////////
-    const dehkotHabibMahar_M1 = new GroupLayer({
-        title: "Deh kot Habib Mahar - M1",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M1_Abdul_Gaffoor_Jatoi, M1_Abdul_Karim_Jatoi, M1_Bangul_Jatoi, M1_Dadilo_Khan_Jatoi]
-
-    });
-
-    const dehkotHabibMahar_M2 = new GroupLayer({
-        title: "Deh kot Habib Mahar - M2",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M2_Habib_Kot]
-    });
-
-    const dehkotHabibMahar_M3 = new GroupLayer({
-        title: "Deh kot Habib Mahar - M3",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M3_Muhammad_Aalam_Shar]
-    });
-
-    const dehkotHabibMahar_M4 = new GroupLayer({
-        title: "Deh kot Habib Mahar - M4",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M4_Teenda]
-    });
-
-    const dehkotHabibMahar_M5 = new GroupLayer({
-        title: "Deh kot Habib Mahar - M5",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M5_Haji_Ali_Muhammad_Brohi, M5_Juma_Khan_Brohi]
-    });
-
-    const dehqaziwahan_M1 = new GroupLayer({
-        title: "Deh Qazi Wahan - M1",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M1_Qadir_Pur]
-    });
-
-    const dehqaziwahan_M2 = new GroupLayer({
-        title: "Deh Qazi Wahan - M2",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M2_Qazi_Wahan]
-    });
-
-    const dehqaziwahan_M3 = new GroupLayer({
-        title: "Deh Qazi Wahan - M3",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M3_Jaffer_Dasti]
-    });
-
-    const dehqaziwahan_M4 = new GroupLayer({
-        title: "Deh Qazi Wahan - M4",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M4_Nandhi_Kal_Wari]
-    });
-
-    const dehqaziwahan_M5 = new GroupLayer({
-        title: "Deh Qazi Wahan - M5",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M5_Loung_Labano]
-    });
-
-    const dehqaziwahan_M6 = new GroupLayer({
-        title: "Deh Qazi Wahan - M6",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M6_MilitaryForm_QalandarBux]
-    });
-
-    const dehqaziwahan_M7 = new GroupLayer({
-        title: "Deh Qazi Wahan - M7",
-        visible: true,
-        visibilityMode: "independent",
-        layers: [M7_Mad_Khoso]
-    });
-
-    map.addMany([ boundaryLayer, districtsLayer, dehFeatureLayer,
-        dehkotHabibMahar_M1, dehkotHabibMahar_M2, dehkotHabibMahar_M3, dehkotHabibMahar_M4, dehkotHabibMahar_M5,
-        dehqaziwahan_M1, dehqaziwahan_M2, dehqaziwahan_M3, dehqaziwahan_M4, dehqaziwahan_M5, dehqaziwahan_M6, dehqaziwahan_M7]);
-
-
-        // =============================================================================
-        // MAP & VIEW
-        // =============================================================================
-        // const map = new Map({
-        //     basemap: "satellite",
-        //     layers: [
-        //         boundaryLayer, districtsLayer, dehFeatureLayer, M1_Abdul_Gaffoor_Jatoi
-        //     ]
-        // });
-    // 2. Initialize the MapView centered over Sindh, Pakistan
-    const view = new MapView({
-        container: "map",
-        map : map,
-        center: [68.456299194, 26.440361376], // [Longitude, Latitude]
-        zoom: 9,
-        ui: {
-            components: ["attribution"] // Remove default zoom so we can position it manually
-        }
-    });
-
-    // Add Custom Zoom Control to Top-Right Corner (just below the header)
-    const zoomWidget = new Zoom({
-        view: view
-    });
-    view.ui.add(zoomWidget, "top-right");
-
-    // Add Scale Bar Tool at Bottom-Left Corner
-    const scaleBarExpand = new Expand({ view, content: new ScaleBar({ view, style: "line", unit: "metric" }), expandIcon: "measure-line" });
-    view.ui.add(scaleBarExpand, "bottom-left");
-
-    // Add Home Button
-    const homeBtn = new Home({
-        view: view
-    });
-    view.ui.add(new Home({ view }), "top-trailing");
-
-    // Add Compass Widget
-    const compass = new Compass({
-        view: view
-    });
-    view.ui.add(new Compass({view}), "top-right");
-
-    // Add Basemap Gallery Widget wrapped inside an Expand widget at Bottom-Right Corner
-    const basemapGallery = new BasemapGallery({
-        view: view
-    });
-
-    const bgExpand = new Expand({
-        view: view,
-        content: basemapGallery,
-        expandIcon: "basemap",
-        expandTooltip: "Basemap Gallery"
-    });
-    view.ui.add(bgExpand, "bottom-right");
-
-    // Add Layer List Widget with opacity sliders and legend buttons
-    const layerList = new LayerList({
-        view: view,
-        listItemCreatedFunction: function(event) {
-            const item = event.item;
-            item.panel = {
-                content: "legend",
-                open: false
-            };
-
-        }
-    });
-
-    // const layerListExpand = new Expand({
-    //     view: view,
-    //     content: layerList,
-    //     expandIcon: "layers",
-    //     expandTooltip: "Layer List"
-    // });
-    view.ui.add(layerList, "top-right");
-
-    // 3. Add Custom Floating "Info Desk" Toggle Button Control on Map Top-Left
-    const toggleBtnNode = document.createElement("div");
-    toggleBtnNode.id = "mapToggleBtnContainer";
-    toggleBtnNode.className = "map-toggle-control";
-    toggleBtnNode.innerHTML = `<span>QUERY DATA</span>`;
-
-    toggleBtnNode.addEventListener("click", function() {
-        const sidebar = document.getElementById("sidebar");
-        sidebar.classList.remove("collapsed");
-        toggleBtnNode.classList.add("hidden");
-    });
-
-    view.ui.add(toggleBtnNode, "top-left");
-
-    // 4. Close / Cross Button Functionality inside Sidebar
-    const sidebarCloseBtn = document.getElementById("sidebarCloseBtn");
-    if (sidebarCloseBtn) {
-        sidebarCloseBtn.addEventListener("click", function() {
-            const sidebar = document.getElementById("sidebar");
-            sidebar.classList.add("collapsed");
-            toggleBtnNode.classList.remove("hidden");
-        });
+const dehFeatureLayer = new GeoJSONLayer({
+    url: "https://www.arcgis.com/sharing/rest/content/items/8ea72b39982844f7873ad2d529c57bf0/data",
+    title: "Deh Administrative Layer",
+    popupTemplate: {
+        title: "{Deh}",
+        content: `
+            <b>District:</b> {District}<br>
+            <b>Tehsil/Taluka:</b> {Taluka}<br>
+            <b>Deh:</b> {Deh}
+        `
     }
+});
 
-    // 5. Add NESPAK Logo Watermark to Bottom Right Corner (aligned with bottom controls)
-    const watermarkNode = document.createElement("div");
-    watermarkNode.className = "map-nespak-watermark";
-    watermarkNode.innerHTML = `
-        <span>Designed by</span>
-        <img src="images/nespaklogo.png" alt="NESPAK Logo" class="logo-nespak-map" onerror="this.style.display='none'">
-    `;
-    view.ui.add(watermarkNode, "bottom-right");
+// Village / Mauza child layers
+const M1_Abdul_Gaffoor_Jatoi        = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/5f2031c1340145b6b54b33449c5056ca/data", title: "M1 Abdul Gaffoor Jatoi",       visible: true });
+const M1_Abdul_Karim_Jatoi          = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/70b69adf88a247da875cbcc8663579e0/data", title: "M1 Abdul Kariim Jatoi",        visible: true });
+const M1_Bangul_Jatoi               = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/cdc73404a70949f29e9eb2f0a7e471e3/data", title: "M1 Bangul Jatoi",              visible: true });
+const M1_Dadilo_Khan_Jatoi          = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/99ff164c26af41e7ae859548c2a1fa80/data", title: "M1 Dadilo Khan Jatoi",         visible: true });
+const M1_Qadir_Pur                  = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/70a5fee21d16449eac3102383eec6889/data", title: "M1 Qadir Pur",                 visible: true });
+const M2_Habib_Kot                  = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/65c1b90f9c7547ce8d27ff16fb8b2787/data", title: "M2 Habib Kot",                 visible: true });
+const M2_Qazi_Wahan                 = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/2ea0ac8d3a184eafa6a606b11dab21dc/data", title: "M2 Qazi Wahan",                visible: true });
+const M3_Jaffer_Dasti               = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/98ee98fd86714378bf197732d3db1ec7/data", title: "M3 Jaffer Dasti",              visible: true });
+const M3_Muhammad_Aalam_Shar        = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/8c3448c3ab7e460294c428136d60c347/data", title: "M3 Muhammad Aalam Shar",       visible: true });
+const M4_Nandhi_Kal_Wari            = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/d96a0fd3108f4e58b5454992efa4817f/data", title: "M4 Nandhi Kal Wari",           visible: true });
+const M4_Teenda                     = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/764be13b9e5144e597bfce54cef6ac6e/data", title: "M4 Teenda",                    visible: true });
+const M5_Haji_Ali_Muhammad_Brohi    = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/4e33dda4f48e4b17826c52c21c26560a/data", title: "M5 Haji Ali Muhammad Brohi",   visible: true });
+const M5_Juma_Khan_Brohi            = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/f0828f6021264ab280828d91a74e49fa/data", title: "M5 Juma Khan Brohi",           visible: true });
+const M5_Loung_Labano               = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/df7b8fa81a3c42e0a039adf013e29939/data", title: "M5 Loung Labano",              visible: true });
+const M6_MilitaryForm_QalandarBux   = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/9aa1b945e91e476994f9aff2d9d7de02/data", title: "M6 Military Form QalandarBux", visible: true });
+const M7_Mad_Khoso                  = new GeoJSONLayer({ url: "https://www.arcgis.com/sharing/rest/content/items/ca8d8744e4fb4075a1862ca517838ade/data", title: "M7 Mad Khoso",                 visible: true });
 
-    // Auto-popup functionality for dynamic layer popups
-    function formatFieldName(name) {
-        return name
-            .replace(/_/g, ' ')
-            .replace(/([a-z])([A-Z])/g, '$1 $2')
-            .replace(/\b\w/g, char => char.toUpperCase());
+// Group layers
+const dehkotHabibMahar_M1 = new GroupLayer({ title: "Deh kot Habib Mahar - M1", visible: true, visibilityMode: "independent", layers: [M1_Abdul_Gaffoor_Jatoi, M1_Abdul_Karim_Jatoi, M1_Bangul_Jatoi, M1_Dadilo_Khan_Jatoi] });
+const dehkotHabibMahar_M2 = new GroupLayer({ title: "Deh kot Habib Mahar - M2", visible: true, visibilityMode: "independent", layers: [M2_Habib_Kot] });
+const dehkotHabibMahar_M3 = new GroupLayer({ title: "Deh kot Habib Mahar - M3", visible: true, visibilityMode: "independent", layers: [M3_Muhammad_Aalam_Shar] });
+const dehkotHabibMahar_M4 = new GroupLayer({ title: "Deh kot Habib Mahar - M4", visible: true, visibilityMode: "independent", layers: [M4_Teenda] });
+const dehkotHabibMahar_M5 = new GroupLayer({ title: "Deh kot Habib Mahar - M5", visible: true, visibilityMode: "independent", layers: [M5_Haji_Ali_Muhammad_Brohi, M5_Juma_Khan_Brohi] });
+const dehqaziwahan_M1     = new GroupLayer({ title: "Deh Qazi Wahan - M1", visible: true, visibilityMode: "independent", layers: [M1_Qadir_Pur] });
+const dehqaziwahan_M2     = new GroupLayer({ title: "Deh Qazi Wahan - M2", visible: true, visibilityMode: "independent", layers: [M2_Qazi_Wahan] });
+const dehqaziwahan_M3     = new GroupLayer({ title: "Deh Qazi Wahan - M3", visible: true, visibilityMode: "independent", layers: [M3_Jaffer_Dasti] });
+const dehqaziwahan_M4     = new GroupLayer({ title: "Deh Qazi Wahan - M4", visible: true, visibilityMode: "independent", layers: [M4_Nandhi_Kal_Wari] });
+const dehqaziwahan_M5     = new GroupLayer({ title: "Deh Qazi Wahan - M5", visible: true, visibilityMode: "independent", layers: [M5_Loung_Labano] });
+const dehqaziwahan_M6     = new GroupLayer({ title: "Deh Qazi Wahan - M6", visible: true, visibilityMode: "independent", layers: [M6_MilitaryForm_QalandarBux] });
+const dehqaziwahan_M7     = new GroupLayer({ title: "Deh Qazi Wahan - M7", visible: true, visibilityMode: "independent", layers: [M7_Mad_Khoso] });
+
+map.addMany([
+    boundaryLayer, districtsLayer, dehFeatureLayer,
+    dehkotHabibMahar_M1, dehkotHabibMahar_M2, dehkotHabibMahar_M3, dehkotHabibMahar_M4, dehkotHabibMahar_M5,
+    dehqaziwahan_M1, dehqaziwahan_M2, dehqaziwahan_M3, dehqaziwahan_M4, dehqaziwahan_M5, dehqaziwahan_M6, dehqaziwahan_M7
+]);
+
+// =============================================================================
+// MAP VIEW
+// =============================================================================
+const view = new MapView({
+    container: "map",
+    map,
+    center: [68.456299194, 26.440361376],
+    zoom: 9,
+    ui: { components: ["attribution"] }
+});
+
+// Widgets
+view.ui.add(new Zoom({ view }), "top-right");
+view.ui.add(new ScaleBar({ view, style: "line", unit: "metric" }), "bottom-left");
+view.ui.add(new Home({ view }), "top-right");
+view.ui.add(new Compass({ view }), "top-right");
+
+const bgExpand = new Expand({
+    view,
+    content: new BasemapGallery({ view }),
+    expandIcon: "basemap",
+    expandTooltip: "Basemap Gallery"
+});
+view.ui.add(bgExpand, "bottom-right");
+
+const layerList = new LayerList({
+    view,
+    listItemCreatedFunction: (event) => {
+        event.item.panel = { content: "legend", open: false };
     }
+});
+view.ui.add(layerList, "top-right");
 
-    function enableAutoPopupsForGeoJSON(layers) {
-        const systemFields = [
-            "objectid", "globalid", 
-            "geometry", "type"
-        ];
+// NESPAK watermark
+const watermarkNode = document.createElement("div");
+watermarkNode.className = "map-nespak-watermark";
+watermarkNode.innerHTML = `
+    <span>Designed by</span>
+    <img src="images/nespaklogo.png" alt="NESPAK" class="logo-nespak-map" onerror="this.style.display='none'">
+`;
+view.ui.add(watermarkNode, "bottom-right");
 
-        layers.forEach(layer => {
-            if (layer.type === "geojson" || layer.type === "feature") {
-                layer.when(() => {
-                    if (!layer.fields || layer.fields.length === 0) return;
+// =============================================================================
+// AUTO POPUP — all GeoJSON layers
+// =============================================================================
+const systemFields = ["objectid", "globalid", "geometry", "type"];
 
-                    const visibleFieldInfos = layer.fields
-                        .filter(field => !systemFields.includes(field.name.toLowerCase()))
-                        .map(field => {
-                            return {
-                                fieldName: field.name,
-                                label: (field.alias && field.alias !== field.name) 
-                                    ? field.alias 
-                                    : formatFieldName(field.name),
-                                visible: true
-                            };
-                        });
+function formatFieldName(name) {
+    return name.replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b\w/g, c => c.toUpperCase());
+}
 
-                    layer.popupTemplate = new PopupTemplate({
-                        title: layer.title ? `${layer.title} Details` : "Feature Attributes",
-                        content: [{
-                            type: "fields",
-                            fieldInfos: visibleFieldInfos
-                        }]
-                    });
-                }).catch(err => {
-                    console.error(`Error loading fields for layer ${layer.title || layer.id}:`, err);
+function enableAutoPopups(layers) {
+    layers.forEach(layer => {
+        if (layer.type === "geojson" || layer.type === "feature") {
+            layer.when(() => {
+                if (!layer.fields || layer.fields.length === 0) return;
+                const infos = layer.fields
+                    .filter(f => !systemFields.includes(f.name.toLowerCase()))
+                    .map(f => ({
+                        fieldName: f.name,
+                        label: (f.alias && f.alias !== f.name) ? f.alias : formatFieldName(f.name),
+                        visible: true
+                    }));
+                layer.popupTemplate = new PopupTemplate({
+                    title: layer.title ? `${layer.title} Details` : "Feature Attributes",
+                    content: [{ type: "fields", fieldInfos: infos }]
                 });
-            }
+            }).catch(err => console.error(`Popup error for ${layer.title}:`, err));
+        }
+    });
+}
+
+const allChildLayers = [
+    M1_Abdul_Gaffoor_Jatoi, M1_Abdul_Karim_Jatoi, M1_Bangul_Jatoi, M1_Dadilo_Khan_Jatoi, M1_Qadir_Pur,
+    M2_Habib_Kot, M2_Qazi_Wahan,
+    M3_Jaffer_Dasti, M3_Muhammad_Aalam_Shar,
+    M4_Nandhi_Kal_Wari, M4_Teenda,
+    M5_Haji_Ali_Muhammad_Brohi, M5_Juma_Khan_Brohi, M5_Loung_Labano,
+    M6_MilitaryForm_QalandarBux,
+    M7_Mad_Khoso
+];
+enableAutoPopups([districtsLayer, boundaryLayer, dehFeatureLayer, ...allChildLayers]);
+
+// =============================================================================
+// DOM REFERENCES
+// =============================================================================
+const districtSelect    = document.getElementById('districtSelect');
+const tehsilSelect      = document.getElementById('tehsilSelect');
+const dehSelect         = document.getElementById('dehSelect');
+const villageSelect     = document.getElementById('villageSelect');
+const resetBtn          = document.getElementById('resetBtn');
+const applyQueryBtn     = document.getElementById('applyQueryBtn');
+
+// Info panel elements
+const statDistricts     = document.getElementById('statDistricts');
+const statTalukas       = document.getElementById('statTalukas');
+const statDehs          = document.getElementById('statDehs');
+const statVillages      = document.getElementById('statVillages');
+const infoCountHH       = document.getElementById('infoCountHH');
+const infoCountPop      = document.getElementById('infoCountPop');
+const infoCountFeatures = document.getElementById('infoCountFeatures');
+const chartArea         = document.getElementById('chartArea');
+const chartBars         = document.getElementById('chartBars');
+const tableWrapper      = document.getElementById('tableWrapper');
+const tableCountBadge   = document.getElementById('tableCountBadge');
+const villageList       = document.getElementById('villageList');
+const villageSearchInput = document.getElementById('villageSearchInput');
+
+// =============================================================================
+// QUERY HELPERS
+// =============================================================================
+async function loadDistricts() {
+    const q = new Query();
+    q.outFields = ["District"];
+    q.returnDistinctValues = true;
+    q.where = "1=1";
+    try {
+        const res = await dehFeatureLayer.queryFeatures(q);
+        const vals = new Set(res.features.map(f => f.attributes.District).filter(Boolean));
+        districtSelect.innerHTML = '<option value="">— Choose District —</option>';
+        vals.forEach(v => {
+            const o = document.createElement('option');
+            o.value = o.textContent = v;
+            districtSelect.appendChild(o);
         });
-    }
+        updateStats({ districts: vals.size });
+    } catch (e) { console.error("loadDistricts:", e); }
+}
 
-    // Enable auto-popups for all layers including child layers
-    const allChildLayers = [
-        M1_Abdul_Gaffoor_Jatoi, M1_Abdul_Karim_Jatoi, M1_Bangul_Jatoi, M1_Dadilo_Khan_Jatoi, M1_Qadir_Pur,
-        M2_Habib_Kot, M2_Qazi_Wahan,
-        M3_Jaffer_Dasti, M3_Muhammad_Aalam_Shar,
-        M4_Nandhi_Kal_Wari, M4_Teenda,
-        M5_Haji_Ali_Muhammad_Brohi, M5_Juma_Khan_Brohi, M5_Loung_Labano,
-        M6_MilitaryForm_QalandarBux,
-        M7_Mad_Khoso
-    ];
-    
-    enableAutoPopupsForGeoJSON([districtsLayer, boundaryLayer, dehFeatureLayer, ...allChildLayers]);
+async function loadTehsils(district) {
+    const q = new Query();
+    q.outFields = ["Taluka"];
+    q.returnDistinctValues = true;
+    q.where = `District = '${district}'`;
+    try {
+        const res = await dehFeatureLayer.queryFeatures(q);
+        const vals = new Set(res.features.map(f => f.attributes.Taluka).filter(Boolean));
+        tehsilSelect.innerHTML = '<option value="">— Choose Taluka —</option>';
+        vals.forEach(v => {
+            const o = document.createElement('option');
+            o.value = o.textContent = v;
+            tehsilSelect.appendChild(o);
+        });
+        updateStats({ talukas: vals.size });
+    } catch (e) { console.error("loadTehsils:", e); }
+}
 
-    // 6. Administrative Hierarchy with FeatureLayer Queries
-    const districtSelect = document.getElementById('districtSelect');
-    const tehsilSelect = document.getElementById('tehsilSelect');
-    const dehSelect = document.getElementById('dehSelect');
-    const resetBtn = document.getElementById('resetBtn');
+async function loadDehs(district, taluka) {
+    const q = new Query();
+    q.outFields = ["Deh"];
+    q.returnDistinctValues = true;
+    q.where = `District = '${district}' AND Taluka = '${taluka}'`;
+    try {
+        const res = await dehFeatureLayer.queryFeatures(q);
+        const vals = new Set(res.features.map(f => f.attributes.Deh).filter(Boolean));
+        dehSelect.innerHTML = '<option value="">— Choose Deh —</option>';
+        vals.forEach(v => {
+            const o = document.createElement('option');
+            o.value = o.textContent = v;
+            dehSelect.appendChild(o);
+        });
+        updateStats({ dehs: vals.size });
+    } catch (e) { console.error("loadDehs:", e); }
+}
 
-    // Load distinct districts on initialization
-    async function loadDistricts() {
-        const query = new Query();
-        query.outFields = ["District"];
-        query.returnDistinctValues = true;
-        query.where = "1=1";
-
-        try {
-            const result = await dehFeatureLayer.queryFeatures(query);
-            const districts = new Set();
-            result.features.forEach(feature => {
-                if (feature.attributes.District) {
-                    districts.add(feature.attributes.District);
-                }
-            });
-
-            districtSelect.innerHTML = '<option value="">-- Choose District --</option>';
-            districts.forEach(district => {
-                const option = document.createElement('option');
-                option.value = district;
-                option.textContent = district;
-                districtSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error("Error loading districts:", error);
+async function goToExtent(whereClause, zoomLevel) {
+    await dehFeatureLayer.load();
+    const q = new Query();
+    q.where = whereClause;
+    q.returnGeometry = true;
+    q.outSpatialReference = view.spatialReference;
+    try {
+        const res = await dehFeatureLayer.queryExtent(q);
+        if (res.extent) {
+            view.goTo({ extent: res.extent, zoom: zoomLevel });
         }
-    }
+    } catch (e) { console.error("goToExtent:", e); }
+}
 
-    // Load distinct tehsils for selected district
-    async function loadTehsils(districtName) {
-        const query = new Query();
-        query.outFields = ["Taluka"];
-        query.returnDistinctValues = true;
-        query.where = `District = '${districtName}'`;
+// =============================================================================
+// STATS CARDS (left panel)
+// =============================================================================
+let _stats = { districts: 0, talukas: 0, dehs: 0, villages: 0 };
 
-        try {
-            const result = await dehFeatureLayer.queryFeatures(query);
-            const tehsils = new Set();
-            result.features.forEach(feature => {
-                if (feature.attributes.Taluka) {
-                    tehsils.add(feature.attributes.Taluka);
-                }
-            });
+function updateStats(partial) {
+    Object.assign(_stats, partial);
+    statDistricts.textContent = _stats.districts || '—';
+    statTalukas.textContent   = _stats.talukas   || '—';
+    statDehs.textContent      = _stats.dehs       || '—';
+    statVillages.textContent  = _stats.villages   || '—';
+}
 
-            tehsilSelect.innerHTML = '<option value="">-- Choose Tehsil --</option>';
-            tehsils.forEach(tehsil => {
-                const option = document.createElement('option');
-                option.value = tehsil;
-                option.textContent = tehsil;
-                tehsilSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error("Error loading tehsils:", error);
-        }
-    }
-
-    // Load distinct dehs for selected tehsil
-    async function loadDehs(districtName, tehsilName) {
-        const query = new Query();
-        query.outFields = ["Deh"];
-        query.returnDistinctValues = true;
-        query.where = `District = '${districtName}' AND Taluka = '${tehsilName}'`;
-
-        try {
-            const result = await dehFeatureLayer.queryFeatures(query);
-            const dehs = new Set();
-            result.features.forEach(feature => {
-                if (feature.attributes.Deh) {
-                    dehs.add(feature.attributes.Deh);
-                }
-            });
-
-            dehSelect.innerHTML = '<option value="">-- Choose Deh --</option>';
-            dehs.forEach(deh => {
-                const option = document.createElement('option');
-                option.value = deh;
-                option.textContent = deh;
-                dehSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error("Error loading dehs:", error);
-        }
-    }
-
-    // Initialize districts
-    loadDistricts();
-
-    // District change handler
-    districtSelect.addEventListener('change', async function() {
-        const selectedDistrict = this.value;
-        
-        // Reset dependent dropdowns
-        tehsilSelect.innerHTML = '<option value="">-- Choose Tehsil --</option>';
-        dehSelect.innerHTML = '<option value="">-- Choose Deh --</option>';
-        tehsilSelect.disabled = true;
-        dehSelect.disabled = true;
-
-        if (!selectedDistrict) {
-            dehFeatureLayer.definitionExpression = null;
-            view.goTo({ center: [68.5247, 25.8943], zoom: 7 });
-            return;
-        }
-
-        // Filter layer to selected district
-        dehFeatureLayer.definitionExpression = `District = '${selectedDistrict}'`;
-
-        // Wait for layer to load and query extent
+// =============================================================================
+// RIGHT PANEL POPULATION
+// =============================================================================
+async function populateInfoPanel(whereClause) {
+    try {
         await dehFeatureLayer.load();
-        
-        // Query extent and zoom
-        const query = new Query();
-        query.where = `District = '${selectedDistrict}'`;
-        query.returnGeometry = true;
-        query.outSpatialReference = view.spatialReference;
+        const q = new Query();
+        q.where = whereClause;
+        q.outFields = ["*"];
+        q.returnGeometry = false;
+        const res = await dehFeatureLayer.queryFeatures(q);
+        const features = res.features;
 
-        try {
-            const result = await dehFeatureLayer.queryExtent(query);
-            if (result.extent) {
-                view.goTo({ extent: result.extent, zoom: 10 });
-            } else {
-                // Fallback: query features and calculate extent manually
-                const featureResult = await dehFeatureLayer.queryFeatures(query);
-                if (featureResult.features.length > 0) {
-                    const extent = featureResult.features.reduce((acc, feature) => {
-                        if (feature.geometry && feature.geometry.extent) {
-                            if (!acc) return feature.geometry.extent.clone();
-                            acc.union(feature.geometry.extent);
-                        }
-                        return acc;
-                    }, null);
-                    if (extent) {
-                        view.goTo({ extent: extent, zoom: 10 });
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error querying district extent:", error);
-        }
+        const count = features.length;
+        infoCountFeatures.textContent = count;
 
-        // Load tehsils
-        await loadTehsils(selectedDistrict);
-        tehsilSelect.disabled = false;
+        // Attempt to read HH / Population fields if they exist
+        let totalHH = 0, totalPop = 0;
+        features.forEach(f => {
+            const a = f.attributes;
+            totalHH  += (a.HH  || a.hh  || a.Households || 0);
+            totalPop += (a.Population || a.population || a.Pop || 0);
+        });
+        infoCountHH.textContent  = totalHH  || '—';
+        infoCountPop.textContent = totalPop || '—';
+
+        // Table
+        renderTable(features);
+
+        // Chart — count features per District or Taluka
+        const groupKey = features.length && features[0].attributes.Taluka ? 'Taluka' : 'District';
+        const grouped = {};
+        features.forEach(f => {
+            const k = f.attributes[groupKey] || 'Unknown';
+            grouped[k] = (grouped[k] || 0) + 1;
+        });
+        renderChart(grouped);
+
+        // Villages list
+        const villages = [...new Set(features.map(f => f.attributes.Deh || f.attributes.Village || f.attributes.deh).filter(Boolean))];
+        renderVillageList(villages);
+        updateStats({ villages: villages.length });
+
+    } catch (e) { console.error("populateInfoPanel:", e); }
+}
+
+function renderTable(features) {
+    if (!features || features.length === 0) {
+        tableWrapper.innerHTML = '<div class="placeholder-inner"><span class="placeholder-icon">🗂️</span><p>No records found</p></div>';
+        tableCountBadge.textContent = '0 records';
+        return;
+    }
+
+    // Pick a curated set of display fields (exclude geometry/system)
+    const skipFields = new Set(["objectid", "globalid", "OBJECTID", "GLOBALID", "shape", "Shape"]);
+    const firstAttrs = features[0].attributes;
+    const fields = Object.keys(firstAttrs).filter(k => !skipFields.has(k)).slice(0, 6);
+
+    const thead = `<tr>${fields.map(f => `<th>${formatFieldName(f)}</th>`).join('')}</tr>`;
+    const tbody = features.slice(0, 50).map(feat => {
+        const cells = fields.map(f => {
+            const v = feat.attributes[f];
+            return `<td title="${v ?? ''}">${v ?? '—'}</td>`;
+        }).join('');
+        return `<tr>${cells}</tr>`;
+    }).join('');
+
+    tableWrapper.innerHTML = `<table class="attr-table"><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+    tableCountBadge.textContent = `${features.length} record${features.length !== 1 ? 's' : ''}`;
+}
+
+function renderChart(groupedData) {
+    const entries = Object.entries(groupedData);
+    if (entries.length === 0) {
+        chartArea.querySelector('.placeholder-inner') && (chartArea.innerHTML = `<div class="placeholder-inner"><span class="placeholder-icon">📈</span><p>No chart data available</p></div>`);
+        return;
+    }
+
+    // Show bars
+    const maxVal = Math.max(...entries.map(e => e[1]));
+    chartBars.style.display = 'block';
+
+    // Remove old placeholder
+    const placeholder = chartArea.querySelector('.placeholder-inner');
+    if (placeholder) placeholder.remove();
+
+    chartBars.innerHTML = entries.map(([label, val]) => {
+        const pct = Math.round((val / maxVal) * 100);
+        return `
+            <div class="chart-bar-row">
+                <div class="chart-bar-label" title="${label}">${label}</div>
+                <div class="chart-bar-track">
+                    <div class="chart-bar-fill" style="width:${pct}%"></div>
+                </div>
+                <div class="chart-bar-val">${val}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderVillageList(names) {
+    villageList.innerHTML = '';
+    if (!names || names.length === 0) {
+        villageList.innerHTML = '<li class="village-list-empty">No villages found</li>';
+        return;
+    }
+    names.sort().forEach(name => {
+        const li = document.createElement('li');
+        li.textContent = name;
+        li.addEventListener('click', () => {
+            // Zoom to that deh when clicked
+            goToExtent(`Deh = '${name}'`, 14);
+        });
+        villageList.appendChild(li);
     });
+}
 
-    // Tehsil change handler
-    tehsilSelect.addEventListener('change', async function() {
-        const selectedDistrict = districtSelect.value;
-        const selectedTehsil = this.value;
-
-        // Reset deh dropdown
-        dehSelect.innerHTML = '<option value="">-- Choose Deh --</option>';
-        dehSelect.disabled = true;
-
-        if (!selectedTehsil) {
-            dehFeatureLayer.definitionExpression = `District = '${selectedDistrict}'`;
-            return;
-        }
-
-        // Filter layer to selected tehsil
-        dehFeatureLayer.definitionExpression = `District = '${selectedDistrict}' AND Taluka = '${selectedTehsil}'`;
-
-        // Wait for layer to load and query extent
-        await dehFeatureLayer.load();
-
-        // Query extent and zoom
-        const query = new Query();
-        query.where = `District = '${selectedDistrict}' AND Taluka = '${selectedTehsil}'`;
-        query.returnGeometry = true;
-        query.outSpatialReference = view.spatialReference;
-
-        try {
-            const result = await dehFeatureLayer.queryExtent(query);
-            if (result.extent) {
-                view.goTo({ extent: result.extent, zoom: 12 });
-            } else {
-                // Fallback: query features and calculate extent manually
-                const featureResult = await dehFeatureLayer.queryFeatures(query);
-                if (featureResult.features.length > 0) {
-                    const extent = featureResult.features.reduce((acc, feature) => {
-                        if (feature.geometry && feature.geometry.extent) {
-                            if (!acc) return feature.geometry.extent.clone();
-                            acc.union(feature.geometry.extent);
-                        }
-                        return acc;
-                    }, null);
-                    if (extent) {
-                        view.goTo({ extent: extent, zoom: 12 });
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error querying tehsil extent:", error);
-        }
-
-        // Load dehs
-        await loadDehs(selectedDistrict, selectedTehsil);
-        dehSelect.disabled = false;
+// Village search filter
+villageSearchInput.addEventListener('input', function () {
+    const term = this.value.toLowerCase();
+    villageList.querySelectorAll('li:not(.village-list-empty)').forEach(li => {
+        li.style.display = li.textContent.toLowerCase().includes(term) ? '' : 'none';
     });
+});
 
-    // Deh change handler
-    dehSelect.addEventListener('change', async function() {
-        const selectedDistrict = districtSelect.value;
-        const selectedTehsil = tehsilSelect.value;
-        const selectedDeh = this.value;
+// =============================================================================
+// DROPDOWN CHANGE HANDLERS
+// =============================================================================
+loadDistricts();
 
-        if (!selectedDeh) {
-            dehFeatureLayer.definitionExpression = `District = '${selectedDistrict}' AND Taluka = '${selectedTehsil}'`;
-            return;
-        }
+districtSelect.addEventListener('change', async function () {
+    const d = this.value;
+    tehsilSelect.innerHTML = '<option value="">— Choose Taluka —</option>';
+    dehSelect.innerHTML    = '<option value="">— Choose Deh —</option>';
+    villageSelect.innerHTML = '<option value="">— Choose Village —</option>';
+    tehsilSelect.disabled = true;
+    dehSelect.disabled    = true;
+    villageSelect.disabled = true;
 
-        // Filter layer to specific deh
-        dehFeatureLayer.definitionExpression = `District = '${selectedDistrict}' AND Taluka = '${selectedTehsil}' AND Deh = '${selectedDeh}'`;
-
-        // Wait for layer to load and query extent
-        await dehFeatureLayer.load();
-
-        // Query extent and zoom
-        const query = new Query();
-        query.where = `District = '${selectedDistrict}' AND Taluka = '${selectedTehsil}' AND Deh = '${selectedDeh}'`;
-        query.returnGeometry = true;
-        query.outSpatialReference = view.spatialReference;
-
-        try {
-            const result = await dehFeatureLayer.queryExtent(query);
-            if (result.extent) {
-                view.goTo({ extent: result.extent, zoom: 14 });
-            } else {
-                // Fallback: query features and calculate extent manually
-                const featureResult = await dehFeatureLayer.queryFeatures(query);
-                if (featureResult.features.length > 0) {
-                    const extent = featureResult.features.reduce((acc, feature) => {
-                        if (feature.geometry && feature.geometry.extent) {
-                            if (!acc) return feature.geometry.extent.clone();
-                            acc.union(feature.geometry.extent);
-                        }
-                        return acc;
-                    }, null);
-                    if (extent) {
-                        view.goTo({ extent: extent, zoom: 14 });
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error querying deh extent:", error);
-        }
-    });
-
-    // Reset button handler
-    resetBtn.addEventListener('click', function() {
-        districtSelect.value = "";
-        tehsilSelect.innerHTML = '<option value="">-- Choose Tehsil --</option>';
-        dehSelect.innerHTML = '<option value="">-- Choose Deh --</option>';
-        tehsilSelect.disabled = true;
-        dehSelect.disabled = true;
+    if (!d) {
         dehFeatureLayer.definitionExpression = null;
         view.goTo({ center: [68.5247, 25.8943], zoom: 7 });
-        view.popup.close();
-    });
+        return;
+    }
+
+    dehFeatureLayer.definitionExpression = `District = '${d}'`;
+    await goToExtent(`District = '${d}'`, 10);
+    await loadTehsils(d);
+    tehsilSelect.disabled = false;
+    await populateInfoPanel(`District = '${d}'`);
+});
+
+tehsilSelect.addEventListener('change', async function () {
+    const d = districtSelect.value;
+    const t = this.value;
+
+    dehSelect.innerHTML    = '<option value="">— Choose Deh —</option>';
+    villageSelect.innerHTML = '<option value="">— Choose Village —</option>';
+    dehSelect.disabled    = true;
+    villageSelect.disabled = true;
+
+    if (!t) {
+        dehFeatureLayer.definitionExpression = `District = '${d}'`;
+        return;
+    }
+
+    dehFeatureLayer.definitionExpression = `District = '${d}' AND Taluka = '${t}'`;
+    await goToExtent(`District = '${d}' AND Taluka = '${t}'`, 12);
+    await loadDehs(d, t);
+    dehSelect.disabled = false;
+    await populateInfoPanel(`District = '${d}' AND Taluka = '${t}'`);
+});
+
+dehSelect.addEventListener('change', async function () {
+    const d  = districtSelect.value;
+    const t  = tehsilSelect.value;
+    const dh = this.value;
+
+    villageSelect.innerHTML = '<option value="">— Choose Village —</option>';
+    villageSelect.disabled  = true;
+
+    if (!dh) {
+        dehFeatureLayer.definitionExpression = `District = '${d}' AND Taluka = '${t}'`;
+        return;
+    }
+
+    dehFeatureLayer.definitionExpression = `District = '${d}' AND Taluka = '${t}' AND Deh = '${dh}'`;
+    await goToExtent(`District = '${d}' AND Taluka = '${t}' AND Deh = '${dh}'`, 14);
+    await populateInfoPanel(`District = '${d}' AND Taluka = '${t}' AND Deh = '${dh}'`);
+});
+
+applyQueryBtn.addEventListener('click', async function () {
+    const d  = districtSelect.value;
+    const t  = tehsilSelect.value;
+    const dh = dehSelect.value;
+
+    let where = "1=1";
+    if (d)  where = `District = '${d}'`;
+    if (t)  where += ` AND Taluka = '${t}'`;
+    if (dh) where += ` AND Deh = '${dh}'`;
+
+    dehFeatureLayer.definitionExpression = where === "1=1" ? null : where;
+    if (where !== "1=1") {
+        const zoom = dh ? 14 : t ? 12 : 10;
+        await goToExtent(where, zoom);
+        await populateInfoPanel(where);
+    }
+});
+
+resetBtn.addEventListener('click', function () {
+    districtSelect.value = '';
+    tehsilSelect.innerHTML = '<option value="">— Choose Taluka —</option>';
+    dehSelect.innerHTML    = '<option value="">— Choose Deh —</option>';
+    villageSelect.innerHTML = '<option value="">— Choose Village —</option>';
+    tehsilSelect.disabled  = true;
+    dehSelect.disabled     = true;
+    villageSelect.disabled = true;
+
+    dehFeatureLayer.definitionExpression = null;
+    view.goTo({ center: [68.5247, 25.8943], zoom: 7 });
+    view.popup.close();
+
+    // Reset info panel
+    infoCountHH.textContent  = '—';
+    infoCountPop.textContent = '—';
+    infoCountFeatures.textContent = '—';
+    tableWrapper.innerHTML   = '<div class="placeholder-inner"><span class="placeholder-icon">🗂️</span><p>Select an area to view records</p></div>';
+    tableCountBadge.textContent = '0 records';
+    chartBars.style.display  = 'none';
+    chartBars.innerHTML      = '';
+    villageList.innerHTML    = '<li class="village-list-empty">Query an area to see villages</li>';
+    villageSearchInput.value = '';
+    updateStats({ districts: 0, talukas: 0, dehs: 0, villages: 0 });
+    loadDistricts();
+});

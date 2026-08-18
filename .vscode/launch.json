@@ -5,7 +5,11 @@
             "type": "chrome",
             "request": "launch",
             "name": "Run SPHF Dashboard",
-            "file": "${workspaceFolder}/index.html"
+            "url": "http://localhost:8080/index.html",
+            "webRoot": "${workspaceFolder}",
+            "server": {
+                "command": "python -m http.server 8080"
+            }
         }
     ]
 }
